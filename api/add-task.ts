@@ -40,6 +40,10 @@ export default async function handler(
 
   const { title, category, execMonth } = (req.body ?? {}) as RequestBody;
 
+  console.log("category raw:", category);
+console.log("allowed:", Array.from(allowedCategories));
+
+
   if (!isNonEmptyString(title)) {
     errorResponse(res, "title must be a non-empty string");
     return;
