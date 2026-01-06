@@ -86,8 +86,10 @@ export default async function handler(
     });
 
     res.status(200).json({ ok: true, id: response.id });
-  } catch (error) {
-    console.error("Notion API error", error);
-    res.status(500).json({ ok: false, error: "Failed to create task" });
-  }
+} catch (err: unknown) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error("Notion API error:", message);
+  res.status(500).json({ ok: false, error: message });
+}
+
 }
