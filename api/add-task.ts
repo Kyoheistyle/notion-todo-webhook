@@ -56,10 +56,22 @@ export default async function handler(
     return;
   }
 
-  if (!isValidExecMonth(execMonth)) {
-    errorResponse(res, "execMonth must be an integer between 1 and 12");
-    return;
-  }
+// execMonth を number に変換（ショートカットのメニュー結果は string で来る）
+const execMonthNum =
+  typeof execMonth === "string"
+    ? Number(execMonth)
+    : execMonth;
+
+// 1〜12 の整数かチェック
+if (
+  !Number.isInteger(execMonthNum) ||
+  execMonthNum < 1 ||
+  execMonthNum > 12
+) {
+  errorResponse(res, "execMonth must be an integer between 1 and 12");
+  return;
+}
+
 
   if (!databaseId) {
     res.status(500).json({ ok: false, error: "NOTION_DATABASE_ID is missing" });
@@ -76,9 +88,9 @@ export default async function handler(
         カテゴリ: {
           select: { name: category },
         },
-        実行月: {
-          number: execMonth,
-        },
+       実行月: {
+  number: execMonthNum,
+},
         達成: {
           checkbox: false,
         },
