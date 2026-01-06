@@ -1,3 +1,9 @@
+export default async function handler(req, res) {
+  console.log('受け取ったbody:', req.body)
+
+  // 既存処理
+}
+
 import { Client } from "@notionhq/client";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
