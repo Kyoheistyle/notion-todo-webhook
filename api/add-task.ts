@@ -28,7 +28,7 @@ const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
 
 const isValidExecMonth = (value: unknown): value is number =>
-  Number.isInteger(value) && value >= 1 && value <= 12;
+  typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 12;
 
 export default async function handler(
   req: VercelRequest,
