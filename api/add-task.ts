@@ -1,9 +1,3 @@
-export default async function handler(req, res) {
-  console.log('受け取ったbody:', req.body)
-
-  // 既存処理
-}
-
 import { Client } from "@notionhq/client";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
@@ -13,12 +7,7 @@ type RequestBody = {
   execMonth?: unknown;
 };
 
-const allowedCategories = new Set([
-  "買い物",
-  "Private",
-  "Works",
-  "処理済(待ち)",
-]);
+const allowedCategories = new Set(["買い物", "Private", "Works", "処理済(待ち)"]);
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
@@ -34,12 +23,17 @@ const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
 
 const isValidExecMonth = (value: unknown): value is number =>
-  typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 12;
+  typeof value === "number" &&
+  Number.isInteger(value) &&
+  value >= 1 &&
+  value <= 12;
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
+  console.log("受け取ったbody:", req.body);
+
   if (req.method !== "POST") {
     res.status(405).json({ ok: false, error: "Method Not Allowed" });
     return;
@@ -92,10 +86,9 @@ export default async function handler(
     });
 
     res.status(200).json({ ok: true, id: response.id });
-} catch (err: unknown) {
-  const message = err instanceof Error ? err.message : String(err);
-  console.error("Notion API error:", message);
-  res.status(500).json({ ok: false, error: message });
-}
-
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Notion API error:", message);
+    res.status(500).json({ ok: false, error: message });
+  }
 }
