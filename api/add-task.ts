@@ -22,12 +22,6 @@ const errorResponse = (res: VercelResponse, message: string) => {
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
 
-const isValidExecMonth = (value: unknown): value is number =>
-  typeof value === "number" &&
-  Number.isInteger(value) &&
-  value >= 1 &&
-  value <= 12;
-
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
@@ -56,22 +50,18 @@ export default async function handler(
     return;
   }
 
-// execMonth を number に変換（ショートカットのメニュー結果は string で来る）
-const execMonthNum =
-  typeof execMonth === "string"
-    ? Number(execMonth)
-    : execMonth;
+  // execMonth を number に変換（ショートカットのメニュー結果は string で来る想定）
+  const execMonthNum: number =
+    typeof execMonth === "string"
+      ? Number(execMonth)
+      : typeof execMonth === "number"
+        ? execMonth
+        : NaN;
 
-// 1〜12 の整数かチェック
-if (
-  !Number.isInteger(execMonthNum) ||
-  execMonthNum < 1 ||
-  execMonthNum > 12
-) {
-  errorResponse(res, "execMonth must be an integer between 1 and 12");
-  return;
-}
-
+  if (!Number.isInteger(execMonthNum) || execMonthNum < 1 || execMonthNum > 12) {
+    errorResponse(res, "execMonth must be an integer between 1 and 12");
+    return;
+  }
 
   if (!databaseId) {
     res.status(500).json({ ok: false, error: "NOTION_DATABASE_ID is missing" });
@@ -88,9 +78,9 @@ if (
         カテゴリ: {
           select: { name: category },
         },
-       実行月: {
-  number: execMonthNum,
-},
+        実行月: {
+          number: execMonthNum,
+        },
         達成: {
           checkbox: false,
         },
